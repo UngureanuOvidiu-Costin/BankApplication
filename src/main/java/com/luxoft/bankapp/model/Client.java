@@ -242,4 +242,8 @@ public class Client {
     public void setRepository(ClientRepository repository) {
         this.repository = repository;
     }
+
+    public void setAccounts(List<AbstractAccount> accounts) {
+        this.accounts = accounts;
+    }
 }

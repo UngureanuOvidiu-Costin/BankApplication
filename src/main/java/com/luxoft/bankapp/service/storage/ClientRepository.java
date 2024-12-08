@@ -1,9 +1,12 @@
 package com.luxoft.bankapp.service.storage;
 
 import com.luxoft.bankapp.model.Client;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface ClientRepository {
 
     Client add(Client client);

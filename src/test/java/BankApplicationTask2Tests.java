@@ -47,7 +47,7 @@ public class BankApplicationTask2Tests {
         }
 
         // TODO you can replace code above with this when will have the method
-//        BankApplication.initialize(applicationContext);
+        //BankApplication.initialize(applicationContext);
     }
 
     @Test

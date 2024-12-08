@@ -10,31 +10,51 @@ import com.luxoft.bankapp.service.BankingImpl;
 import com.luxoft.bankapp.model.Client.Gender;
 import com.luxoft.bankapp.service.storage.ClientRepository;
 import com.luxoft.bankapp.service.storage.MapClientRepository;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class BankApplication {
 
     private static final String[] CLIENT_NAMES =
             {"Jonny Bravo", "Adam Budzinski", "Anna Smith"};
 
+    // Mail v1(inainte sa modific)
+//    public static void main(String[] args) {
+//
+//        ClientRepository repository = new MapClientRepository();
+//        Banking banking = initialize(repository);
+//
+//        workWithExistingClients(banking);
+//
+//        bankingServiceDemo(banking);
+//
+////        bankReportsDemo(repository);
+//    }
+
+    // Main v2
     public static void main(String[] args) {
 
-        ClientRepository repository = new MapClientRepository();
-        Banking banking = initialize(repository);
+        // Load the Spring context from the application-context.xml
+        ApplicationContext context = new ClassPathXmlApplicationContext("application-context.xml"); //, "test-clients.xml"
+
+        // Get the Banking bean from the context
+        Banking banking = initialize(context);
 
         workWithExistingClients(banking);
-
         bankingServiceDemo(banking);
 
-//        bankReportsDemo(repository);
+        //bankReportsDemo(repository);
+        bankReportsDemo(context);
     }
 
-    public static void bankReportsDemo(ClientRepository repository) {
+    public static void bankReportsDemo(ApplicationContext context) {
 
         System.out.println("\n=== Using BankReportService ===\n");
 
-        BankReportService reportService = new BankReportServiceImpl();
-        reportService.setRepository(repository);
+        // Get the BankReportService bean from the application context
+        BankReportService reportService = (BankReportService) context.getBean("bankReportService");
 
+        // Now you can use the reportService with already injected repository
         System.out.println("Number of clients: " + reportService.getNumberOfBankClients());
 
         System.out.println("Number of accounts: " + reportService.getAccountsNumber());
@@ -63,20 +83,15 @@ public class BankApplication {
     }
 
     public static void workWithExistingClients(Banking banking) {
-
         System.out.println("\n=======================================");
         System.out.println("\n===== Work with existing clients ======");
 
         Client jonny = banking.getClient(CLIENT_NAMES[0]);
 
         try {
-
             jonny.deposit(5_000);
-
         } catch (ActiveAccountNotSet e) {
-
             System.out.println(e.getMessage());
-
             jonny.setDefaultActiveAccountIfNotSet();
             jonny.deposit(5_000);
         }
@@ -85,7 +100,6 @@ public class BankApplication {
 
         Client adam = banking.getClient(CLIENT_NAMES[1]);
         adam.setDefaultActiveAccountIfNotSet();
-
         adam.withdraw(1500);
 
         double balance = adam.getBalance();
@@ -100,23 +114,29 @@ public class BankApplication {
     /*
      * Method that creates a few clients and initializes them with sample values
      */
-    public static Banking initialize(ClientRepository repository) {
+    public static Banking initialize(ApplicationContext context) {
 
-        Banking banking = new BankingImpl();
+        // Get the Banking bean from the context
+        Banking banking = context.getBean(Banking.class);
+
+        // Get the ClientRepository bean from the context
+        ClientRepository repository = context.getBean(ClientRepository.class);
+
+        // Use the repository in the banking service (though, it will already be set via autowiring)
         banking.setRepository(repository);
 
-        Client client_1 = new Client(CLIENT_NAMES[0], Gender.MALE);
+        Client client_1 = (Client) context.getBean("client1");
 
-        AbstractAccount savingAccount = new SavingAccount(1000);
-        client_1.addAccount(savingAccount);
+//        AbstractAccount savingAccount = new SavingAccount(1000);
+//        client_1.addAccount(savingAccount);
+//
+//        AbstractAccount checkingAccount = new CheckingAccount(1000);
+//        client_1.addAccount(checkingAccount);
 
-        AbstractAccount checkingAccount = new CheckingAccount(1000);
-        client_1.addAccount(checkingAccount);
+        Client client_2 = (Client) context.getBean("client2");
 
-        Client client_2 = new Client(CLIENT_NAMES[1], Gender.MALE);
-
-        AbstractAccount checking = new CheckingAccount(1500);
-        client_2.addAccount(checking);
+//        AbstractAccount checking = new CheckingAccount(1500);
+//        client_2.addAccount(checking);
 
         banking.addClient(client_1);
         banking.addClient(client_2);

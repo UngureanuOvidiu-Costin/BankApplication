@@ -3,8 +3,10 @@ package com.luxoft.bankapp.service;
 import com.luxoft.bankapp.model.AbstractAccount;
 import com.luxoft.bankapp.model.Client;
 import com.luxoft.bankapp.service.storage.ClientRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+
 
 public interface Banking {
 
@@ -29,4 +31,5 @@ public interface Banking {
     void transferMoney(Client from, Client to, double amount);
 
     void setRepository(ClientRepository storage);
+
 }
